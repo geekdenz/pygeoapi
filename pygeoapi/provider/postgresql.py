@@ -301,6 +301,12 @@ class PostgreSQLProvider(BaseProvider):
             row_data = cursor.fetchall()[0]
             feature = self.__response_feature(row_data)
 
+            cursor.execute(SQL('SELECT ST_SRID({}) AS srid FROM {} WHERE {}=%s').format(
+                Identifier(self.geom), Identifier(self.table),
+                Identifier(self.id_field),
+            ), (identifier,))
+            srid_result = cursor.fetchall()
+            feature['crs:epsg'] = srid_result[0]['srid']
             return feature
 
     def __response_feature(self, row_data):
