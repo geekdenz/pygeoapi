@@ -76,9 +76,11 @@
           <div class="col-sm-12">
           {% for link in data['links'] %}
             {% if link['rel'] == 'prev' %}
-            <a role="button" href="{{ link['href'] }}?f=html">Prev</a>
+            <!-- <a role="button" href="{{ link['href'] }}?f=html">Prev</a> -->
+            <a role="button" href="../items/{{ data['previous'] }}?f=html">Prev</a>
             {% elif link['rel'] == 'next' %}
-            <a role="button" href="{{ link['href'] }}?f=html">Next</a>
+            <!-- <a role="button" href="{{ link['href'] }}?f=html">Next</a> -->
+            <a role="button" href="../items/{{ data['next'] }}?f=html">Next</a>
             {% endif %}
           {% endfor %}
           </div>
