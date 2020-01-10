@@ -32,6 +32,7 @@ import csv
 import itertools
 import logging
 
+from pygeoapi.plugin import load_plugin, PLUGINS
 from pygeoapi.provider.base import BaseProvider, ProviderQueryError
 
 LOGGER = logging.getLogger(__name__)
@@ -50,11 +51,19 @@ class CSVProvider(BaseProvider):
         """
 
         BaseProvider.__init__(self, provider_def)
-        self.geometry_x = provider_def['geometry']['x_field']
-        self.geometry_y = provider_def['geometry']['y_field']
+        self.geometry_x = provider_def["geometry"]["x_field"]
+        self.geometry_y = provider_def["geometry"]["y_field"]
 
-    def _load(self, startindex=0, limit=10, resulttype='results',
-              identifier=None, bbox=[], datetime=None, properties=[]):
+    def _load(
+        self,
+        startindex=0,
+        limit=10,
+        resulttype="results",
+        identifier=None,
+        bbox=[],
+        datetime=None,
+        properties=[],
+    ):
         """
         Load CSV data
 
@@ -68,59 +77,64 @@ class CSVProvider(BaseProvider):
 
         found = False
         result = None
-        feature_collection = {
-            'type': 'FeatureCollection',
-            'features': []
-        }
+        feature_collection = {"type": "FeatureCollection", "features": []}
 
         with open(self.data) as ff:
-            LOGGER.debug('Serializing DictReader')
+            LOGGER.debug("Serializing DictReader")
             data_ = csv.DictReader(ff)
-            if resulttype == 'hits':
-                LOGGER.debug('Returning hits only')
-                feature_collection['numberMatched'] = len(list(data_))
+            if resulttype == "hits":
+                LOGGER.debug("Returning hits only")
+                feature_collection["numberMatched"] = len(list(data_))
                 return feature_collection
-            LOGGER.debug('Slicing CSV rows')
-            for row in itertools.islice(data_, startindex, startindex+limit):
-                feature = {'type': 'Feature'}
-                feature['id'] = row.pop(self.id_field)
-                feature['geometry'] = {
-                    'type': 'Point',
-                    'coordinates': [
+            LOGGER.debug("Slicing CSV rows")
+            for row in itertools.islice(data_, startindex, startindex + limit):
+                feature = {"type": "Feature"}
+                feature["id"] = row.pop(self.id_field)
+                feature["geometry"] = {
+                    "type": "Point",
+                    "coordinates": [
                         float(row.pop(self.geometry_x)),
-                        float(row.pop(self.geometry_y))
-                    ]
+                        float(row.pop(self.geometry_y)),
+                    ],
                 }
                 if self.properties:
-                    feature['properties'] = OrderedDict()
+                    feature["properties"] = OrderedDict()
                     for p in self.properties:
                         try:
-                            feature['properties'][p] = row[p]
+                            feature["properties"][p] = row[p]
                         except KeyError as err:
                             LOGGER.error(err)
                             raise ProviderQueryError()
                 else:
-                    feature['properties'] = row
+                    feature["properties"] = row
 
-                if identifier is not None and feature['id'] == identifier:
+                if identifier is not None and feature["id"] == identifier:
                     found = True
                     result = feature
-                feature_collection['features'].append(feature)
-                feature_collection['numberMatched'] = \
-                    len(feature_collection['features'])
+                feature_collection["features"].append(feature)
+                feature_collection["numberMatched"] = len(
+                    feature_collection["features"]
+                )
 
         if identifier is not None and not found:
             return None
         elif identifier is not None and found:
             return result
 
-        feature_collection['numberReturned'] = len(
-            feature_collection['features'])
+        feature_collection["numberReturned"] = len(feature_collection["features"])
 
         return feature_collection
 
-    def query(self, startindex=0, limit=10, resulttype='results',
-              bbox=[], datetime=None, properties=[], sortby=[]):
+    def query(
+        self,
+        startindex=0,
+        limit=10,
+        resulttype="results",
+        bbox=[],
+        datetime=None,
+        properties=[],
+        sortby=[],
+    ):
         """
         CSV query
 
@@ -149,4 +163,4 @@ class CSVProvider(BaseProvider):
         return self._load(identifier=identifier)
 
     def __repr__(self):
-        return '<CSVProvider> {}'.format(self.data)
+        return "<CSVProvider> {}".format(self.data)
