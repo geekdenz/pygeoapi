@@ -1157,12 +1157,15 @@ def check_format(args, headers):
     format_ = None
     if headers_:
         headers_ = headers_.split(",")
-
-        if "text/html" in headers_:
-            format_ = "html"
-        elif "application/ld+json" in headers_:
-            format_ = "jsonld"
-        elif "application/json" in headers_:
-            format_ = "json"
+        header_types = {
+            "text/html": "html",
+            "application/ld+json": "jsonld",
+            "application/json": "json",
+            "application/x-sqlite3": "geopackage",
+            "application/geopackage+sqlite3": "geopackage",
+        }
+        for k in header_types.keys():
+            if k in headers_:
+                return header_types[k]
 
     return format_
