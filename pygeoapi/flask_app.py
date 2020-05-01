@@ -38,6 +38,7 @@ from flask import Flask, make_response, request
 
 from pygeoapi.api import API
 from pygeoapi.util import yaml_load
+from importlib import import_module # to load plugins defined in server.config.yml @see example-config.yaml
 
 APP = Flask(__name__)
 APP.url_map.strict_slashes = False
@@ -57,6 +58,12 @@ if CONFIG['server'].get('cors', False):
 
 APP.config['JSONIFY_PRETTYPRINT_REGULAR'] = \
     CONFIG['server'].get('pretty_print', True)
+
+plugins = CONFIG['server'].get('plugins')
+if plugins:
+    for p in plugins:
+        print('Loading plugin: ' + p)
+        import_module('plugins.' + p)
 
 api_ = API(CONFIG)
 
