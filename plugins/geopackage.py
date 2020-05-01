@@ -1,7 +1,7 @@
 from pygeoapi.formatter.formatters import register
-from pygeoapi.formatter.base import BaseFormatter
 from pygeoapi.util import json_serial
 import json
+
 
 class GeopackageFormatter:
     def handle(self, headers_, content, default=json_serial):

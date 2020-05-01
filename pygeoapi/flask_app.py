@@ -37,8 +37,10 @@ import click
 from flask import Flask, make_response, request
 
 from pygeoapi.api import API
+import sys
 from pygeoapi.util import yaml_load
-from importlib import import_module # to load plugins defined in server.config.yml @see example-config.yaml
+# to load plugins defined in server.config.yml @see example-config.yaml
+from importlib import import_module
 
 APP = Flask(__name__)
 APP.url_map.strict_slashes = False
@@ -62,8 +64,8 @@ APP.config['JSONIFY_PRETTYPRINT_REGULAR'] = \
 plugins = CONFIG['server'].get('plugins')
 if plugins:
     for p in plugins:
-        print('Loading plugin: ' + p)
-        import_module('plugins.' + p)
+        print('Loading plugin: ' + ','.join(sys.path) + ' ' + p)
+        import_module(p)
 
 api_ = API(CONFIG)
 

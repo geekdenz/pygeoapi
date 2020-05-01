@@ -41,9 +41,10 @@ import pytz
 from pygeoapi import __version__
 from pygeoapi.linked_data import (geojson2geojsonld, jsonldify,
                                   jsonldify_collection)
-from pygeoapi.formatter.formatters import formatters # formatters are registered here
+# formatters are registered here
 # register(format_, formatterClass) allows plugins to register formatters that
 # are valid for this plugin
+from pygeoapi.formatter.formatters import formatters
 from pygeoapi.log import setup_logger
 from pygeoapi.plugin import load_plugin, PLUGINS
 from pygeoapi.provider.base import ProviderConnectionError, ProviderQueryError
@@ -823,7 +824,8 @@ class API(object):
             return headers_, 200, content
 
         if format_ in formatters:
-            formatter = formatters[format_]() # instanciates formatter registered for format_
+            # instanciates formatter registered for format_
+            formatter = formatters[format_]()
             return formatter.handle(headers_, content, default=json_serial)
         # return formatter.some(self, headers, args, dataset, pathinfo=None)
         return headers_, 200, json.dumps(content, default=json_serial)
